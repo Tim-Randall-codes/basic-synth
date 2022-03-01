@@ -10,9 +10,10 @@ import AudioKit
 import SoundpipeAudioKit
 
 let engine = AudioEngine()
-let osc = Oscillator(waveform: Table(.sine), frequency: 1600, amplitude: 0.8)
+let osc = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8)
 let filter = AmplitudeEnvelope(osc, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.3)
 // can pass these as properties into the view structs!
+// it has sine square and sawtooth
 
 struct ContentView: View {
     @State var started: Bool = false
