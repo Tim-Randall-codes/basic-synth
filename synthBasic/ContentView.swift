@@ -9,44 +9,54 @@ import SwiftUI
 import AudioKit
 import SoundpipeAudioKit
 
+let engine = AudioEngine()
+let osc = Oscillator(waveform: Table(.sine), frequency: 400, amplitude: 0.8)
+let filter = AmplitudeEnvelope(osc, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.9)
 // need to learn how to get the AmplitudeEnvelope to trigger release
 
 struct ContentView: View {
-    let engine = AudioEngine()
-    let osc = Oscillator()
     @State var playing: Bool = false
+
     var body: some View {
         VStack{
             Button(action:{
-                sound()
+                startItUp()
             }, label:{
-                Text("Play")
+                Text("Start it up")
             })
             Button(action:{
-                
+                startNStop()
             }, label:{
-                Text("stop")
+                Text("stop and play it")
             })
         }
     }
-    func sound() {
-        let filter = AmplitudeEnvelope(osc, attackDuration: 1, decayDuration: 0.0, sustainLevel: 1, releaseDuration: 0.5)
-        // play
-        if playing == false {
-            osc.start()
-            filter.openGate()
-            engine.output = filter
-            do { try engine.start()}
-            catch { print("error starting engine")}
-            playing = true
-            }
-        //stop
-        else {
+    func startItUp() {
+        osc.start()
+        engine.output = filter
+        do { try engine.start()}
+        catch { print("error starting engine")}
+        // stop
+        if playing == true {
             filter.closeGate()
-            let timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { timer in
-                osc.stop()
-            }
             playing = false
+            }
+        // play
+        else {
+            filter.openGate()
+            playing = true
+        }
+    }
+    func startNStop() {
+        // stop
+        if playing == true {
+            filter.closeGate()
+            playing = false
+            }
+        // play
+        else {
+            filter.openGate()
+            playing = true
         }
     }
 }
