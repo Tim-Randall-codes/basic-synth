@@ -9,15 +9,21 @@ import SwiftUI
 import AudioKit
 import SoundpipeAudioKit
 
-let engine = AudioEngine()
-let osc = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8)
-let osc2 = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8, detuningOffset: 2, detuningMultiplier: 1)
-let mixer = Mixer(osc, osc2)
-let filter = AmplitudeEnvelope(mixer, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.3)
-// can pass these as properties into the view structs!
+let number: Float = 440
+var engine = AudioEngine()
+var osc = Oscillator(waveform: Table(.sawtooth), frequency: number, amplitude: 0.8)
+var osc2 = Oscillator(waveform: Table(.square), frequency: number, amplitude: 0.8, detuningOffset: 2, detuningMultiplier: 1)
+var mixer = Mixer(osc, osc2)
+var filter = AmplitudeEnvelope(osc, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.7)
+
 // it has sine square and sawtooth
 
 struct ContentView: View {
+    var eng: AudioEngine
+    var o1: Oscillator
+    var o2: Oscillator
+    var m: Mixer
+    var f: AmplitudeEnvelope
     @State var started: Bool = false
     @State var playing: Bool = false
     var body: some View {
@@ -31,21 +37,21 @@ struct ContentView: View {
     }
     func startItUp() {
         if started == false {
-            osc.start()
-            osc2.start()
-            engine.output = filter
-            do { try engine.start()}
+            o1.start()
+            o2.start()
+            eng.output = f
+            do { try eng.start()}
             catch { print("error starting engine")}
             started = true
         }
         // stop
         if playing == true {
-            filter.closeGate()
+            f.closeGate()
             playing = false
             }
         // play
         else {
-            filter.openGate()
+            f.openGate()
             playing = true
         }
     }
@@ -53,6 +59,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(eng: engine, o1: osc, o2: osc2, m: mixer, f: filter)
     }
 }

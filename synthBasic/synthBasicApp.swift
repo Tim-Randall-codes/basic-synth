@@ -11,7 +11,7 @@ import SwiftUI
 struct synthBasicApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(eng: engine, o1: osc, o2: osc2, m: mixer, f: filter)
         }
     }
 }
