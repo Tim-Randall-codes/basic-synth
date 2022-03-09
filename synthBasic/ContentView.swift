@@ -11,7 +11,9 @@ import SoundpipeAudioKit
 
 let engine = AudioEngine()
 let osc = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8)
-let filter = AmplitudeEnvelope(osc, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.3)
+let osc2 = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8, detuningOffset: 2, detuningMultiplier: 1)
+let mixer = Mixer(osc, osc2)
+let filter = AmplitudeEnvelope(mixer, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.3)
 // can pass these as properties into the view structs!
 // it has sine square and sawtooth
 
@@ -30,6 +32,7 @@ struct ContentView: View {
     func startItUp() {
         if started == false {
             osc.start()
+            osc2.start()
             engine.output = filter
             do { try engine.start()}
             catch { print("error starting engine")}
