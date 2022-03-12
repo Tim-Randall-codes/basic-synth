@@ -9,35 +9,13 @@ import SwiftUI
 import AudioKit
 import SoundpipeAudioKit
 
-let number: Float = 440
-var engine = AudioEngine()
-var osc = Oscillator(waveform: Table(.sawtooth), frequency: number, amplitude: 0.8)
-var osc2 = Oscillator(waveform: Table(.square), frequency: number, amplitude: 0.8, detuningOffset: 2, detuningMultiplier: 1)
-var mixer = Mixer(osc, osc2)
-var filter = AmplitudeEnvelope(mixer, attackDuration: 1, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.7)
+// this stuff is just trying out two oscillators, remember to remove os2 from button function. Currently playing an a major chord. 
 
-var engine2 = AudioEngine()
-var oscTwo = Oscillator(waveform: Table(.square), frequency: 300, amplitude: 0.8, detuningOffset: 2, detuningMultiplier: 1)
-var osc2Two = Oscillator(waveform: Table(.sine), frequency: 300, amplitude: 0.8, detuningOffset: 2, detuningMultiplier: 1)
-var mixerTwo = Mixer(oscTwo, osc2Two)
-var filterTwo = AmplitudeEnvelope(mixerTwo, attackDuration: 0.3, decayDuration: 0.01, sustainLevel: 0.8, releaseDuration: 0.3)
-
-struct Sound {
-    var freq: Float
-    var amp: Float
-    var detune: Float
-    var a: Float
-    var d: Float
-    var s: Float
-    var r: Float
-    var engine = AudioEngine()
-    lazy var osc = Oscillator(waveform: Table(.square), frequency: freq, amplitude: amp, detuningOffset: detune, detuningMultiplier: 1)
-    lazy var osc2 = Oscillator(waveform: Table(.sine), frequency: freq, amplitude: amp, detuningOffset: detune, detuningMultiplier: 1)
-    lazy var mixer = Mixer(oscTwo, osc2Two)
-    lazy var filter = AmplitudeEnvelope(mixerTwo, attackDuration: a, decayDuration: d, sustainLevel: s, releaseDuration: r)
-}
-
-var soundOne = Sound(freq: 600, amp: 1, detune: 2, a: 0.3, d: 0.01, s: 0.8, r: 0.3)
+var os1 = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8, detuningOffset: 1)
+var os2 = Oscillator(waveform: Table(.sawtooth), frequency: 554.37, amplitude: 0.8, detuningOffset: 1)
+var os3 = Oscillator(waveform: Table(.sawtooth), frequency: 659.26, amplitude: 0.8, detuningOffset: 1)
+var mix = Mixer(os1, os2, os3)
+var filtah = AmplitudeEnvelope(mix, attackDuration: 0.1, decayDuration: 0.01, sustainLevel: 0.9, releaseDuration: 0.3)
 
 // the struct below will create a sound over the required frequencies.
 
@@ -74,55 +52,20 @@ struct MainView: View {
     var soundNumber: Int
     var body: some View {
         VStack{
-            ButtonView2(o1: tones[soundNumber].osc1, f: tones[soundNumber].filter1)
-            ButtonView2(o1: tones[soundNumber].osc2, f: tones[soundNumber].filter2)
-            ButtonView2(o1: tones[soundNumber].osc3, f: tones[soundNumber].filter3)
-            ButtonView2(o1: tones[soundNumber].osc4, f: tones[soundNumber].filter4)
-            ButtonView2(o1: tones[soundNumber].osc5, f: tones[soundNumber].filter5)
-        }
-    }
-}
-
-struct ButtonView: View {
-    var eng = AudioEngine()
-    var o1: Oscillator
-    var o2: Oscillator
-    var m: Mixer
-    var f: AmplitudeEnvelope
-    @State var started: Bool = false
-    @State var playing: Bool = false
-    var body: some View {
-            Button(action:{
-                startItUp()
-            }, label:{
-                Text("Play/stop")
-            })
-    }
-    func startItUp() {
-        if started == false {
-            o1.start()
-            o2.start()
-            eng.output = f
-            do { try eng.start()}
-            catch { print("error starting engine")}
-            started = true
-        }
-        // stop
-        if playing == true {
-            f.closeGate()
-            playing = false
-            }
-        // play
-        else {
-            f.openGate()
-            playing = true
+            ButtonView(o1: tones[soundNumber].osc1, f: tones[soundNumber].filter1)
+            ButtonView(o1: tones[soundNumber].osc2, f: tones[soundNumber].filter2)
+            ButtonView(o1: tones[soundNumber].osc3, f: tones[soundNumber].filter3)
+            ButtonView(o1: tones[soundNumber].osc4, f: tones[soundNumber].filter4)
+            ButtonView(o1: tones[soundNumber].osc5, f: tones[soundNumber].filter5)
+            Spacer()
+            ButtonView(o1: os1, f: filtah)
         }
     }
 }
 
 //use this button below
 
-struct ButtonView2: View {
+struct ButtonView: View {
     var eng = AudioEngine()
     var o1: Oscillator
     var f: AmplitudeEnvelope
@@ -138,6 +81,7 @@ struct ButtonView2: View {
     func startItUp() {
         if started == false {
             o1.start()
+            os2.start()
             eng.output = f
             do { try eng.start()}
             catch { print("error starting engine")}
@@ -158,6 +102,6 @@ struct ButtonView2: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView(soundNumber: 1)
+        MainView(soundNumber: 0)
     }
 }
