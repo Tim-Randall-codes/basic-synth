@@ -11,7 +11,7 @@ import SwiftUI
 struct synthBasicApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView()
+            MainView(soundNumber: 1)
         }
     }
 }
