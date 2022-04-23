@@ -11,7 +11,11 @@ import SwiftUI
 struct synthBasicApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView(soundNumber: 0)
+            MainView(soundNumber: 2)
         }
     }
+}
+
+class NumberOO: ObservableObject {
+    var num: Float = 0.01
 }

@@ -5,11 +5,18 @@
 //  Created by Tim Randall on 28/2/22.
 //
 
+// use observable object to pass the data between views. Make start it up an init function
+
 import SwiftUI
 import AudioKit
 import SoundpipeAudioKit
 
-// this stuff is just trying out two oscillators, remember to remove os2 from button function. Currently playing an a major chord. 
+var attack: Float = 0.01
+var decay: Float = 0
+var sustain: Float = 1
+var release: Float = 0.3
+
+// this stuff is just trying out two oscillators, remember to remove os2 from button function. Currently playing an a major chord. s
 
 var os1 = Oscillator(waveform: Table(.sawtooth), frequency: 440, amplitude: 0.8, detuningOffset: 1)
 var os2 = Oscillator(waveform: Table(.sawtooth), frequency: 554.37, amplitude: 0.8, detuningOffset: 1)
@@ -43,12 +50,19 @@ struct Sounds {
 //saw loud
 var tones : [Sounds] = [Sounds(a: 0.1, d: 0.01, s: 0.8, r: 0.3, detune: 1, waveform: Table(.sawtooth)),
 //square pluck
-                        Sounds(a: 0.1, d: 0.3, s: 0, r: 0.3, detune: 1, waveform: Table(.square))]
+                        Sounds(a: 0.1, d: 0.3, s: 0, r: 0.3, detune: 1, waveform: Table(.square)),
+                        Sounds(a: attack, d: decay, s: sustain, r: release, detune: 1, waveform: Table(.sawtooth))]
 
 
 // this is the view that shows all of the buttons. The sound the button plays is selected from the list using an integer inserted into this list.
 
 struct MainView: View {
+    @State var attackV: Double = 0.01 { didSet { attack = Float(attackV)
+        refreshSounds()
+    }}
+    @State var decayV: Double = 0 { didSet { decay = Float(decayV)}}
+    @State var sustainV: Double = 1 { didSet { sustain = Float(sustainV)}}
+    @State var releaseV: Double = 0.3 { didSet { release = Float(releaseV)}}
     var soundNumber: Int
     var body: some View {
         VStack{
@@ -58,19 +72,25 @@ struct MainView: View {
             ButtonView(o1: tones[soundNumber].osc4, f: tones[soundNumber].filter4)
             ButtonView(o1: tones[soundNumber].osc5, f: tones[soundNumber].filter5)
             Spacer()
-            ButtonView(o1: os1, f: filtah)
+            Slider(value: $attackV, in: 0...1)
+            Slider(value: $decayV, in: 0...1)
+            Slider(value: $sustainV, in: 0...1)
+            Slider(value: $releaseV, in: 0...1)
         }
+    }
+    func refreshSounds(){
+        tones[2] = Sounds(a: attack, d: decay, s: sustain, r: release, detune: 1, waveform: Table(.sawtooth))
     }
 }
 
 //use this button below
 
 struct ButtonView: View {
+    @State var started: Bool = false
+    @State var playing: Bool = false
     var eng = AudioEngine()
     var o1: Oscillator
     var f: AmplitudeEnvelope
-    @State var started: Bool = false
-    @State var playing: Bool = false
     var body: some View {
             Button(action:{
                 startItUp()
@@ -100,8 +120,4 @@ struct ButtonView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView(soundNumber: 0)
-    }
-}
+
